@@ -4,16 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon server.js"
+    "devStart": "nodemon server.js",
+    "test": "jest --coverage"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
     "express-graphql": "^0.12.0",
-    "graphql": "^15.8.0"
+    "graphql": "^15.8.0",
+    "uuidv4": "^6.2.13"
   },
   "devDependencies": {
+    "jest": "^29.6.1",
     "nodemon": "^3.0.1"
   }
 }

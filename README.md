@@ -9,6 +9,14 @@ $ npm install
 $ npm run devStart
 ```
 
+# <a name="test"></a>Run Test
+
+```bash
+$ npm test
+```
+
+![Test Output](https://raw.githubusercontent.com/leocwlam/leolam-gateway-demo/master/docs/test.png)
+
 # <a name="docker-image-container"></a>Build Local Docker Image And Create Container
 
 - Make sure npm install before build docker image
@@ -59,7 +67,7 @@ $ docker start gateway
 
 ```
 {
-  asset(id:2) {
+  asset(id:"3a084194-bb41-4f60-8452-dc6c1035b353") {
     id
     name
     type
@@ -92,7 +100,7 @@ mutation {
 
 ```
 mutation {
-  changeAsset(id: 2, name: "C Name", type: 2, description: "Change Desc") {
+  changeAsset(id: "3a084194-bb41-4f60-8452-dc6c1035b353", name: "C Name", type: 2, description: "Change Desc") {
     id
     name
     type
@@ -108,7 +116,7 @@ mutation {
 
 ```
 mutation {
-  deleteAsset(id: 2) {
+  deleteAsset(id: "3a084194-bb41-4f60-8452-dc6c1035b353") {
     id
   }
 }
