@@ -9,6 +9,34 @@ $ npm install
 $ npm run devStart
 ```
 
+# <a name="docker-image-container"></a>Build Local Docker Image And Create Container
+
+- Make sure npm install before build docker image
+
+```bash
+$ docker build -t gateway:1.0 .
+$ docker run -d \
+-p 4000:4000 \
+--name gateway \
+gateway:1.0
+```
+
+# <a name="docker-stop"></a>
+
+- Stop gateway container
+
+```bash
+$ docker stop gateway
+```
+
+# <a name="docker-start"></a>
+
+- Start gateway container
+
+```bash
+$ docker start gateway
+```
+
 # <a name="example"></a>Example
 
 ## <a name="get-all-assets"></a>Get all assets
