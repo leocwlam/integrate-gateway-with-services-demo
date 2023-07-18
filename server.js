@@ -1,11 +1,13 @@
 const express = require('express')
 const expressGraphQL = require('express-graphql').graphqlHTTP
+const { SortOption, DIRECTION } = require('./helpers/sort_option')
 const { Asset } = require('./entities/asset')
 const { AssetService } = require('./services/asset_service')
 
 const {
   GraphQLSchema,
   GraphQLObjectType,
+  GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLString,
@@ -13,8 +15,27 @@ const {
 } = require('graphql')
 const app = express()
 
+const DESC = 'DESC'
+
 const assetService = new AssetService()
 const assets = []
+
+const SortingParamType = new GraphQLInputObjectType({
+  name: 'SortParm',
+  description: 'Sorting Param',
+  fields: () => ({
+    field: { type: GraphQLNonNull(GraphQLString) },
+    order: { type: GraphQLNonNull(GraphQLString) },
+  }),
+})
+
+const SortingParamsType = new GraphQLInputObjectType({
+  name: 'SortParms',
+  description: 'Sorting Params',
+  fields: () => ({
+    fields: { type: GraphQLList(SortingParamType) },
+  }),
+})
 
 const AssetType = new GraphQLObjectType({
   name: 'Asset',
@@ -28,6 +49,10 @@ const AssetType = new GraphQLObjectType({
   }),
 })
 
+const isValidField = (name) => {
+  return ['id', 'name', 'type', 'description', 'created_at'].includes(name)
+}
+
 const RootQueryType = new GraphQLObjectType({
   name: 'Query',
   description: 'Root Query',
@@ -35,7 +60,25 @@ const RootQueryType = new GraphQLObjectType({
     assets: {
       type: GraphQLList(AssetType),
       description: 'List Of All Assets',
-      resolve: () => assetService.allAssets(),
+      args: {
+        sorts: { type: SortingParamsType },
+      },
+      resolve: (_, args) => {
+        const sortFields = args.sorts?.fields ?? []
+
+        if (sortFields.length === 0) {
+          return assetService.allAssets()
+        }
+
+        const sortOption = new SortOption()
+        for (let sort of sortFields) {
+          if (!isValidField) continue
+          const order =
+            sort.order === DESC ? DIRECTION.DESCENDING : DIRECTION.ASCENDING
+          sortOption.addField(sort.field, order)
+        }
+        return assetService.allAssets(sortOption)
+      },
     },
     asset: {
       type: AssetType,

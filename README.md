@@ -123,3 +123,35 @@ mutation {
 ```
 
 ![Delete Output](https://raw.githubusercontent.com/leocwlam/leolam-gateway-demo/master/docs/delete.png)
+
+## <a name="Sorted-assets"></a>Sorted assets
+
+```
+{
+  assets(sorts:{fields:[{field: "type", order:"DESC"}, {field: "name", order:"ASC"}]}) {
+    id
+    name
+    type
+    description
+    created_at
+  }
+}
+```
+
+![Delete Output](https://raw.githubusercontent.com/leocwlam/leolam-gateway-demo/master/docs/sorted.png)
+
+## <a name="Without-sorted-assets"></a>Without sort assets
+
+```
+{
+  assets {
+    id
+    name
+    type
+    description
+    created_at
+  }
+}
+```
+
+![Delete Output](https://raw.githubusercontent.com/leocwlam/leolam-gateway-demo/master/docs/no_sort.png)

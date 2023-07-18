@@ -6,7 +6,7 @@ class AssetService {
 
   allAssets(sortOptions) {
     if (!sortOptions || !sortOptions?.options?.length) return this.cache
-    const result = this.cache.sort((a, b) => {
+    const result = [...this.cache].sort((a, b) => {
       let resultResult = 0
       for (let sortOption of sortOptions.options) {
         if (sortOption.direction) {

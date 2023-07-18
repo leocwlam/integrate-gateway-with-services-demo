@@ -50,7 +50,7 @@ test('get all assets with mulitple sort options', () => {
   const assetService = new AssetService()
   const newAsset1 = assetService.createAsset('test1', 1, 'create asset test 1')
   const newAsset2 = assetService.createAsset('test2', 2, 'create asset test 2')
-  const newAsset3 = assetService.createAsset('test3', 2, 'create asset test 2')
+  const newAsset3 = assetService.createAsset('test3', 2, 'create asset test 3')
   const sortOption = new SortOption()
   sortOption.addField('type', DIRECTION.DESCENDING)
   sortOption.addField('name', DIRECTION.ASCENDING)
