@@ -7,6 +7,7 @@ $ git clone https://github.com/leocwlam/leolam-gateway-demo.git demo
 $ cd demo
 $ npm install
 $ npm run devStart
+$ open -a "Google Chrome" http://localhost:4000/graphql
 ```
 
 # <a name="test"></a>Run Test
@@ -27,6 +28,7 @@ $ docker run -d \
 -p 4000:4000 \
 --name gateway \
 gateway:1.0
+$ open -a "Google Chrome" http://localhost:4000/graphql
 ```
 
 # <a name="docker-stop"></a>
