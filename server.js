@@ -35,7 +35,7 @@ const RootQueryType = new GraphQLObjectType({
     assets: {
       type: GraphQLList(AssetType),
       description: 'List Of All Assets',
-      resolve: () => assetService.allAsset(),
+      resolve: () => assetService.allAssets(),
     },
     asset: {
       type: AssetType,

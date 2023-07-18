@@ -1,3 +1,4 @@
+const { SortOption, DIRECTION } = require('../helpers/sort_option')
 const { AssetService } = require('./asset_service')
 
 test('create asset', () => {
@@ -13,16 +14,51 @@ test('create asset', () => {
 test('get asset', () => {
   const assetService = new AssetService()
   const newAsset = assetService.createAsset('test', 1, 'create asset test')
-  const getAsset = assetService.getAsset(newAsset.id)
-  expect(newAsset).toEqual(getAsset)
+  const asset = assetService.getAsset(newAsset.id)
+  expect(newAsset).toEqual(asset)
 })
 
-test('get all asset', () => {
+test('get all assets', () => {
   const assetService = new AssetService()
   const newAsset1 = assetService.createAsset('test1', 1, 'create asset test 1')
   const newAsset2 = assetService.createAsset('test2', 2, 'create asset test 2')
-  const getAsset = assetService.allAsset()
+  const assets = assetService.allAssets()
+  expect(assets.length).toBe(2)
+})
+
+test('get all assets with null sort option', () => {
+  const assetService = new AssetService()
+  const newAsset1 = assetService.createAsset('test1', 1, 'create asset test 1')
+  const newAsset2 = assetService.createAsset('test2', 2, 'create asset test 2')
+  const getAsset = assetService.allAssets(null)
   expect(getAsset.length).toBe(2)
+})
+
+test('get all assets with single sort option', () => {
+  const assetService = new AssetService()
+  const newAsset1 = assetService.createAsset('test1', 1, 'create asset test 1')
+  const newAsset2 = assetService.createAsset('test2', 2, 'create asset test 2')
+  const sortOption = new SortOption()
+  sortOption.addField('type', DIRECTION.DESCENDING)
+  const assets = assetService.allAssets(sortOption)
+  expect(assets.length).toBe(2)
+  expect(assets[0]).toEqual(newAsset2)
+  expect(assets[1]).toEqual(newAsset1)
+})
+
+test('get all assets with mulitple sort options', () => {
+  const assetService = new AssetService()
+  const newAsset1 = assetService.createAsset('test1', 1, 'create asset test 1')
+  const newAsset2 = assetService.createAsset('test2', 2, 'create asset test 2')
+  const newAsset3 = assetService.createAsset('test3', 2, 'create asset test 2')
+  const sortOption = new SortOption()
+  sortOption.addField('type', DIRECTION.DESCENDING)
+  sortOption.addField('name', DIRECTION.ASCENDING)
+  const assets = assetService.allAssets(sortOption)
+  expect(assets.length).toBe(3)
+  expect(assets[0]).toEqual(newAsset2)
+  expect(assets[1]).toEqual(newAsset3)
+  expect(assets[2]).toEqual(newAsset1)
 })
 
 test('update asset', () => {
@@ -55,6 +91,5 @@ test('delete asset', () => {
 test('delete not exist asset', () => {
   const assetService = new AssetService()
   const deletedAsset = assetService.deleteAsset('123')
-  console.log(deletedAsset)
   expect(deletedAsset).toBeNull()
 })
