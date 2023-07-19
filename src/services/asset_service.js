@@ -28,7 +28,9 @@ class AssetService {
 
   createAsset(name, type, description) {
     const id = uuidv4()
-    this.cache.push(new Asset(id, name, type, description, new Date()))
+    this.cache.push(
+      new Asset(id, name, type, description, new Date().toUTCString())
+    )
     return this.cache[this.cache.length - 1]
   }
 

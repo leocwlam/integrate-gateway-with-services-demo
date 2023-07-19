@@ -69,7 +69,7 @@ $ docker start gateway
 
 ```
 {
-  asset(id:"3a084194-bb41-4f60-8452-dc6c1035b353") {
+  asset(id:"da7e60a9-4734-474a-96ff-bec11fa95ca4") {
     id
     name
     type
@@ -86,7 +86,7 @@ $ docker start gateway
 
 ```
 mutation {
-  addAsset(name: "ad1", type: 3, description: "test desc") {
+  addAsset(name: "test1", type: 1, description: "test 1") {
     id
     name
     type
@@ -102,7 +102,7 @@ mutation {
 
 ```
 mutation {
-  changeAsset(id: "3a084194-bb41-4f60-8452-dc6c1035b353", name: "C Name", type: 2, description: "Change Desc") {
+  changeAsset(id: "da7e60a9-4734-474a-96ff-bec11fa95ca4", name: "Change A2", type: 2, description: "Change Desc 2") {
     id
     name
     type
@@ -118,7 +118,7 @@ mutation {
 
 ```
 mutation {
-  deleteAsset(id: "3a084194-bb41-4f60-8452-dc6c1035b353") {
+  deleteAsset(id: "da7e60a9-4734-474a-96ff-bec11fa95ca4") {
     id
   }
 }
@@ -141,19 +141,3 @@ mutation {
 ```
 
 ![Delete Output](https://raw.githubusercontent.com/leocwlam/leolam-gateway-demo/master/docs/sorted.png)
-
-## <a name="Without-sorted-assets"></a>Without sort assets
-
-```
-{
-  assets {
-    id
-    name
-    type
-    description
-    created_at
-  }
-}
-```
-
-![Delete Output](https://raw.githubusercontent.com/leocwlam/leolam-gateway-demo/master/docs/no_sort.png)

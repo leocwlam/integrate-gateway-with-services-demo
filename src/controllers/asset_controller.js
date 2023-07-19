@@ -1,11 +1,8 @@
-const express = require('express')
-const expressGraphQL = require('express-graphql').graphqlHTTP
-const { SortOption, DIRECTION } = require('./helpers/sort_option')
-const { Asset } = require('./entities/asset')
-const { AssetService } = require('./services/asset_service')
+const { SortOption, DIRECTION } = require('../helpers/sort_option')
+const { Asset } = require('../entities/asset')
+const { AssetService } = require('../services/asset_service')
 
 const {
-  GraphQLSchema,
   GraphQLObjectType,
   GraphQLInputObjectType,
   GraphQLList,
@@ -13,12 +10,11 @@ const {
   GraphQLString,
   GraphQLInt,
 } = require('graphql')
-const app = express()
 
 const DESC = 'DESC'
+const SUPPORTFIELDS = ['id', 'name', 'type', 'description', 'created_at']
 
 const assetService = new AssetService()
-const assets = []
 
 const SortingParamType = new GraphQLInputObjectType({
   name: 'SortParm',
@@ -49,14 +45,27 @@ const AssetType = new GraphQLObjectType({
   }),
 })
 
-const isValidField = (name) => {
-  return ['id', 'name', 'type', 'description', 'created_at'].includes(name)
+function isValidField(name) {
+  return SUPPORTFIELDS.includes(name)
 }
 
-const RootQueryType = new GraphQLObjectType({
-  name: 'Query',
-  description: 'Root Query',
-  fields: () => ({
+function getAllAssets(sortFields) {
+  if (!sortFields || (sortFields?.length ?? 0) === 0) {
+    return assetService.allAssets()
+  }
+
+  const sortOption = new SortOption()
+  for (let sort of sortFields) {
+    if (!isValidField(sort.field)) continue
+    const order =
+      sort.order === DESC ? DIRECTION.DESCENDING : DIRECTION.ASCENDING
+    sortOption.addField(sort.field, order)
+  }
+  return assetService.allAssets(sortOption)
+}
+
+const queryList = [
+  {
     assets: {
       type: GraphQLList(AssetType),
       description: 'List Of All Assets',
@@ -64,22 +73,12 @@ const RootQueryType = new GraphQLObjectType({
         sorts: { type: SortingParamsType },
       },
       resolve: (_, args) => {
-        const sortFields = args.sorts?.fields ?? []
-
-        if (sortFields.length === 0) {
-          return assetService.allAssets()
-        }
-
-        const sortOption = new SortOption()
-        for (let sort of sortFields) {
-          if (!isValidField) continue
-          const order =
-            sort.order === DESC ? DIRECTION.DESCENDING : DIRECTION.ASCENDING
-          sortOption.addField(sort.field, order)
-        }
-        return assetService.allAssets(sortOption)
+        const sortFields = args.sorts?.fields ?? null
+        return getAllAssets(sortFields)
       },
     },
+  },
+  {
     asset: {
       type: AssetType,
       description: 'A Signle Asset',
@@ -88,13 +87,11 @@ const RootQueryType = new GraphQLObjectType({
       },
       resolve: (_, args) => assetService.getAsset(args.id),
     },
-  }),
-})
+  },
+]
 
-const RootMutationType = new GraphQLObjectType({
-  name: 'Mutation',
-  description: 'Root Mutation',
-  fields: () => ({
+const mutationList = [
+  {
     addAsset: {
       type: AssetType,
       description: 'Add An Asset',
@@ -107,6 +104,8 @@ const RootMutationType = new GraphQLObjectType({
         return assetService.createAsset(args.name, args.type, args.description)
       },
     },
+  },
+  {
     changeAsset: {
       type: AssetType,
       description: 'Update An Asset',
@@ -127,6 +126,8 @@ const RootMutationType = new GraphQLObjectType({
         return assetService.updateAsset(args.id, updateAsset)
       },
     },
+  },
+  {
     deleteAsset: {
       type: AssetType,
       description: 'Delete An Asset And Return The Asset That Was Deleted.',
@@ -137,19 +138,8 @@ const RootMutationType = new GraphQLObjectType({
         return assetService.deleteAsset(args.id)
       },
     },
-  }),
-})
+  },
+]
 
-const schema = new GraphQLSchema({
-  query: RootQueryType,
-  mutation: RootMutationType,
-})
-
-app.use(
-  '/graphql',
-  expressGraphQL({
-    schema: schema,
-    graphiql: true,
-  })
-)
-app.listen(4000, () => console.log('Gateway Server Running'))
+module.exports.queryList = queryList
+module.exports.mutationList = mutationList
