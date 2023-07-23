@@ -1,12 +1,27 @@
+require('dotenv').config()
+const { response } = require('express')
 const { Asset } = require('../entities/asset')
-const { v4: uuidv4 } = require('uuid')
+
+const ASSET_SERVICE_URL =
+  process.env.ASSET_SERVICE_URL ?? 'http://localhost:3000'
+
+function toAssetEntity({ id, name, type, description, created }) {
+  return new Asset(id, name, type, description, created)
+}
+
+function toAssetsEntity(assets) {
+  const assetlist = []
+  for (const asset of assets) {
+    assetlist.push(toAssetEntity(asset))
+  }
+  return assetlist
+}
 
 class AssetService {
-  cache = []
-
-  allAssets(sortOptions) {
-    if (!sortOptions || !sortOptions?.options?.length) return this.cache
-    const result = [...this.cache].sort((a, b) => {
+  #processAssets(assets, sortOptions) {
+    const translateAssets = toAssetsEntity(assets)
+    if (!sortOptions || !sortOptions?.options?.length) return translateAssets
+    const result = translateAssets.sort((a, b) => {
       let resultResult = 0
       for (let sortOption of sortOptions.options) {
         if (sortOption.direction) {
@@ -22,37 +37,66 @@ class AssetService {
     return result
   }
 
-  getAsset(id) {
-    return this.cache.find((asset) => asset.id === id)
+  async allAssets(sortOptions) {
+    return await fetch(`${ASSET_SERVICE_URL}/v1/assets`)
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        return this.#processAssets(data, sortOptions)
+      })
   }
 
-  createAsset(name, type, description) {
-    const id = uuidv4()
-    this.cache.push(
-      new Asset(id, name, type, description, new Date().toUTCString())
-    )
-    return this.cache[this.cache.length - 1]
+  async getAsset(id) {
+    return await fetch(`${ASSET_SERVICE_URL}/v1/assets/${id}`)
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        return toAssetEntity(data)
+      })
   }
 
-  updateAsset(id, modifyAsset) {
-    const asset = this.cache.find((asset) => asset.id === id)
-    const index = this.cache.indexOf(asset)
-    if (index === -1) return null
-
-    asset.name = modifyAsset.name
-    asset.type = modifyAsset.type
-    asset.description = modifyAsset.description
-    this.cache[index] = asset
-    return this.cache[index]
+  async createAsset(name, type, description) {
+    return await fetch(`${ASSET_SERVICE_URL}/v1/assets`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, type, description }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data ? toAssetEntity(data) : null
+      })
   }
 
-  deleteAsset(id) {
-    const asset = this.cache.find((asset) => asset.id === id)
-    if (this.cache.indexOf(asset) !== -1) {
-      delete this.cache[this.cache.indexOf(asset)]
-    }
-    return asset ?? null
+  async updateAsset(id, modifyAsset) {
+    if (!modifyAsset) return null
+    return await fetch(`${ASSET_SERVICE_URL}/v1/assets/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: modifyAsset.name,
+        type: modifyAsset.type,
+        description: modifyAsset.description,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data ? toAssetEntity(data) : null
+      })
+  }
+
+  async deleteAsset(id) {
+    return await fetch(`${ASSET_SERVICE_URL}/v1/assets/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        return data ? toAssetEntity(data) : null
+      })
   }
 }
 
 module.exports.AssetService = AssetService
+module.exports.toAssetEntity = toAssetEntity

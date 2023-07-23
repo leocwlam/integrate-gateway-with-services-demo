@@ -18,33 +18,64 @@ $ npm test
 
 ![Test Output](https://raw.githubusercontent.com/leocwlam/leolam-gateway-demo/master/docs/test.png)
 
+# <a name="config-asset-service"></a>Configuration Asset Service
+
+- Change the ASSET_SERVICE_URL value in .env
+
+or
+
+```bash
+$ ASSET_SERVICE_URL=http://localhost:3000 npm run devStart
+```
+
 # <a name="docker-image-container"></a>Build Local Docker Image And Create Container
 
 - Make sure npm install before build docker image
 
 ```bash
 $ docker build -t gateway:1.0 .
+$ docker network create demo-network
 $ docker run -d \
 -p 4000:4000 \
 --name gateway \
+--network demo-network \
+-e ASSET_SERVICE_URL=http://host.docker.internal:3000 \
 gateway:1.0
 $ open -a "Google Chrome" http://localhost:4000/graphql
 ```
 
-# <a name="docker-stop"></a>
+- Note: We can skip create network `demo-network`, if we already created network before.
 
-- Stop gateway container
+# <a name="docker-stop"></a>Stop Gateway Container
 
 ```bash
 $ docker stop gateway
 ```
 
-# <a name="docker-start"></a>
-
-- Start gateway container
+# <a name="docker-start"></a>Start Gateway Container
 
 ```bash
 $ docker start gateway
+```
+
+# <a name="Simple start up" >Simple Local Dev Docker Startup
+
+```bash
+$ docker build -t gateway:1.0 .
+$ docker build -t asset-service:1.0 .
+```
+
+- Note: `asset-service` can be clone from https://github.com/leocwlam/asset-service.
+
+```bash
+$ docker-compose -f dev-gateway.yaml up -d
+$ open -a "Google Chrome" http://localhost:4000/graphql
+```
+
+# <a name="Simple start up" >Simple Local Dev Docker Tilt Down
+
+```bash
+$ docker-compose -f dev-gateway.yaml down
 ```
 
 # <a name="example"></a>Example
