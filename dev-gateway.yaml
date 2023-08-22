@@ -6,7 +6,7 @@ services:
       - 4000:4000
     environment:
       - ASSET_SERVICE_URL=http://host.docker.internal:3000
-  asset-service:
-    image: asset-service:1.0
+  java-spring-REST-API-demo:
+    image: java-spring-REST-API-demo:1.0
     ports:
       - 3000:8080
